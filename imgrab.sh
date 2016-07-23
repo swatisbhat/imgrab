@@ -2,23 +2,22 @@
 
 usage()
 {
-echo -e "\nUsage: $0 [OPTIONS] [url]"
-echo -e "\nDownloads all images from a specified url.
-Default formats downloaded : png,jpg,jpeg,gif,tif,bmp"
-echo -e "\nOPTIONS:"
-echo "    -h          Print this help menu"
-echo "    -o  DIR     Save all images in the directory DIR
-                (by default all images are saved in a sub-directory in the current directory)"
-echo "    -f \"ext1 ext2 ext3 ..\"     Download specified formats/extensions only"
-echo "    -x \"ext1 ext2 ext3 ..\"     Exclude specified formats/extensions and download the rest"
-echo -e "\nEXAMPLES:
-    Download all the images and save them in the user input directory"
-echo "    $0 -o ~/my/input/dir [url]"
-echo -e "\n    Download only png images and save them in the user input directory"
-echo "    $0 -o ~/my/input/dir -f \"png\" [url]"
-echo -e "\n    Download all images except png and jpg"
-echo "    $0 -x \"png jpg\" [url]"
-echo "    (This will save the images in a sub-dir [url-images] in the current directory)"
+echo -e "\n${BL}${BOLD}${UL}HELP${RESET}"
+echo -e "\n\n${BL}${BOLD}USAGE:\n\n\t${WH}${BOLD}$0 [OPTIONS] [url]"
+echo -e "\n\t${GR}${BOLD}Downloads all images from a specified url.\n\tDefault formats downloaded : png,jpg,jpeg,gif,tif,bmp"
+echo -e "\n\n${BL}${BOLD}OPTIONS:"
+echo -e "\n\t${WH}${BOLD}-h                           ${GR}${BOLD}Print this help menu"
+echo -e "\t${WH}${BOLD}-o DIR                       ${GR}${BOLD}Save all images in the directory DIR\n\t                             (by default all images are saved in a sub-directory in the current directory)"
+echo -e "\t${WH}${BOLD}-f \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Download specified formats/extensions only"
+echo -e "\t${WH}${BOLD}-x \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Exclude specified formats/extensions and download the rest"
+echo -e "\n\n${BL}${BOLD}EXAMPLES:"
+echo -e "\n\t${GR}${BOLD}Download all the images and save them in the user input directory"
+echo -e "\t${WH}${BOLD}$0 -o ~/my/input/dir [url]"
+echo -e "\n\t${GR}${BOLD}Download only png images and save them in the user input directory"
+echo -e "\t${WH}${BOLD}$0 -o ~/my/input/dir -f \"png\" [url]"
+echo -e "\n\t${GR}${BOLD}Download all images except png and jpg"
+echo -e "\t${WH}${BOLD}$0 -x \"png jpg\" [url]"
+echo -e "\t${GR}${BOLD}(This will save the images in a sub-dir [url-images] in the current directory)\n${RESET}"
 }
 
 #DEFAULTS
@@ -29,9 +28,23 @@ DATETIME="`date +%Y%m%d%_H%M`"
 j=0
 total_size=0
 
+#Colour setttings
+RED='\e[1;31m'
+CYAN='\e[1;36m'
+NC='\e[0m'
+BL='\e[1;34m'
+GR='\e[0;32m'
+WH='\e[1;37m'
+YEL='\e[1;33m'
+DG='\e[1;30m'
+
+BOLD=`tput bold`
+UL=`tput smul`
+RESET=`tput sgr0`
+
 #----------------------------------------------------------------------------#
 #spinner function to display progress working indicator
-#Source:
+#Source: http://stackoverflow.com/questions/12498304/using-bash-to-display-a-progress-working-indicator
 
 spinner()
 {
@@ -78,7 +91,7 @@ shift $((OPTIND-1))
 #make sure one and only one mandatory arg(url) is present
 if [ $# -ne 1 ]
 then
-echo "$0 missing url. Type $0 -h to display help"
+echo "Invalid syntax. Type $0 -h to display help"
 exit
 fi
 
@@ -116,9 +129,6 @@ do
 sed -n '/.*'"$t"'/p' args>>temp
 done
 mv temp args
-file=(`cat args`)
-t_count=$(wc -w<args)
-rm args
 fi
 
 if [ $xtrue -eq 1 ]
@@ -130,11 +140,11 @@ do
 sed -n '/.*'"$t"'/!p' args>>temp
 done
 mv temp args
+fi
+
 file=(`cat args`)
 t_count=$(wc -w<args)
 rm args
-fi
-
 
 echo "Downloading ${t_count} Images"
 
@@ -174,7 +184,7 @@ else
 abs_link=$link
 fi
 
-printf "\rFetching file info...            "
+printf "\rFetching file info...                            "
 
 #Parse headers
 IFS=/ read protocol blank host query <<<"$abs_link";
