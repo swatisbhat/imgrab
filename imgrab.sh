@@ -4,10 +4,10 @@ usage()
 {
 echo -e "\n${BL}${BOLD}${UL}HELP${RESET}"
 echo -e "\n\n${BL}${BOLD}USAGE:\n\n\t${WH}${BOLD}$0 [OPTIONS] [url]"
-echo -e "\n\t${GR}${BOLD}Downloads all images from a specified url.\n\tDefault formats downloaded : png,jpg,jpeg,gif,tif,bmp"
+echo -e "\n\t${GR}${BOLD}Downloads all images from a specified url.\n\tDefault formats downloaded : ${WH}${BOLD}png,jpg,jpeg,gif,tif,bmp\n\t${GR}${BOLD}Default download location  :${WH}${BOLD} sub-directory in current directory"
 echo -e "\n\n${BL}${BOLD}OPTIONS:"
 echo -e "\n\t${WH}${BOLD}-h                           ${GR}${BOLD}Print this help menu"
-echo -e "\t${WH}${BOLD}-o DIR                       ${GR}${BOLD}Save all images in the directory DIR\n\t                             (by default all images are saved in a sub-directory in the current directory)"
+echo -e "\t${WH}${BOLD}-o DIR                       ${GR}${BOLD}Save all images in the directory DIR"
 echo -e "\t${WH}${BOLD}-f \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Download specified formats/extensions only"
 echo -e "\t${WH}${BOLD}-x \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Exclude specified formats/extensions and download the rest"
 echo -e "\n\n${BL}${BOLD}EXAMPLES:"
@@ -74,11 +74,12 @@ while getopts 'o:hf:x:' opt ; do
 	ftrue=1 ;;
     x) xforms=$OPTARG;
 	xtrue=1;;
-    \?) usage;
+    \?) 
+        echo -e "Type${GR}${BOLD} $0 -h ${RESET}to display help";
         exit
         ;;
-    :) echo "Option -$OPTARG requires an argument";
-       echo "Type $0 -h to display help"
+    :) echo "Option -$OPTARG requires an argument">&2;
+       echo -e "Type${GR}${BOLD} $0 -h ${RESET}to display help";
        exit
        ;;
 
@@ -91,7 +92,8 @@ shift $((OPTIND-1))
 #make sure one and only one mandatory arg(url) is present
 if [ $# -ne 1 ]
 then
-echo "Invalid syntax. Type $0 -h to display help"
+echo "Invalid syntax, argument missing."
+echo -e "Type${GR}${BOLD} $0 -h${RESET} to display help"
 exit
 fi
 
