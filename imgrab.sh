@@ -1,4 +1,43 @@
 #!/bin/bash
+
+usage() 
+{
+echo "Usage: $0 [optional arguments] [url]"
+echo "Command line options:"
+echo "    -o  DIR     Save all pictures in DIR directory(by default all pictures are saved in the current directory)"
+echo "    -h          Print this help menu"
+echo "Example: Download all the pictures and save them in the user input directory"
+echo "    $0 -o ~/my/input/dir [url]"
+}
+
+
+
+#echo "$COMMAND_LINE_OPTIONS_HELP"
+INPUT_DIR="`pwd`"
+# parse the options
+while getopts 'o:h' opt ; do
+  case $opt in
+    h) echo "$COMMAND_LINE_OPTIONS_HELP"
+       exit 
+    ;;
+    o) INPUT_DIR=$OPTARG ;;
+    \?)
+            echo "Usage: $0 -h for help";
+            usage;
+            exit
+        ;;
+    :) echo "Option -$OPTARG requires an argument";
+       usage;
+       exit 
+       ;;
+
+  esac
+done
+
+shift $((OPTIND-1))
+
+URL=$1
+
 spinner()
 {
 pid=$!
@@ -24,13 +63,13 @@ total_size=0
 
 #########-----------------------######
 
-url=$1
-if [ "${url:0:7}" != 'http://' ]
+
+if [ "${URL:0:7}" != 'http://' ]
 then
-url='http://'$1
+URL='http://'$URL
 fi
-printf "Connecting to: ${url}"
-IFS=/ read protocol blank host query <<<"$url";
+printf "Connecting to: ${URL}"
+IFS=/ read protocol blank host query <<<"$URL";
 
 exec 3< /dev/tcp/$host/80;
 {
@@ -49,17 +88,19 @@ file=( `sed '1,/^$/d' 0<&3|grep -oP 'src="\K\S+?(jpg|png|jpeg)(?=")'|sort -u`)
 
 t_count=${#file[@]}
 #setting download location
-if [ -z "$2" ]
+#if [ -z "$2" ]
+#then 
+#current_dir="`pwd`"
+#path=$current_dir
+#else
+if [ ! -d "$INPUT_DIR" ]
 then 
-current_dir="`pwd`"
-path=$current_dir
-else
-if [ ! -d "$2" ]
-then 
-mkdir $2
+mkdir $INPUT_DIR
 fi
-path="$2"
-fi
+path="$INPUT_DIR"
+#fi
+
+
 
 
 for t in "${file[@]}"
@@ -72,8 +113,8 @@ filename="${j}${ext}";
 link=$t
 if [ "${link:0:4}" != "http" ]
 then 
-export url link
-export abs_link=`python -c 'import os; base=os.environ["url"]; rel=os.environ["link"]; from urlparse import urljoin; print urljoin(str(base).strip(),str(rel).strip())'`
+export URL link
+export abs_link=`python -c 'import os; base=os.environ["URL"]; rel=os.environ["link"]; from urlparse import urljoin; print urljoin(str(base).strip(),str(rel).strip())'`
 else
 abs_link=$link
 fi
@@ -94,6 +135,16 @@ size=$(sed 's/.*/&/' 0<&3|grep Content-Length|awk '{print $2}'|tr -d '\r');
 size=$(echo "$size/1024"|bc -l)
 (curl -s $abs_link > "${path}/${filename}") & spinner;
 done
+
+
+
+
+
+
+
+
+
+
 
 
 
