@@ -16,13 +16,13 @@ A light-weight image download manager written in bash
   
 ##EXAMPLES:
     Download all the images and save them in the user input directory
-    main.sh -o ~/my/input/dir [url]
+    ./imgrab.sh -o ~/my/input/dir [url]
 
     Download only png images and save them in the user input directory
-    main.sh -o ~/my/input/dir -f "png" [url]
+    ./imgrab.sh -o ~/my/input/dir -f "png" [url]
 
     Download all images except png and jpg
-    main.sh -x "png jpg" [url]
+    ./imgrab.sh -x "png jpg" [url]
 	  (This will save the images in a sub-dir [url-images] in the current directory)
  
 
