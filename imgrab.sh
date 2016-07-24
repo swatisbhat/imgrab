@@ -24,7 +24,7 @@ echo -e "\t${GR}${BOLD}(This will save the images in a sub-dir [url-images] in t
 otrue=0
 ftrue=0
 xtrue=0
-DATETIME="`date +%Y%m%d%_H%M`"
+DATETIME="`date +%Y%m%d%H%M`"
 j=0
 total_size=0
 
