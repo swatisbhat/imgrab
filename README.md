@@ -1,7 +1,7 @@
 # imgrab
 A light-weight image download manager written in bash
 ##INSTALLATION
-Unzip the downloaded zip file
+    Unzip the downloaded zip file
     cd imgrab-master
     sh configure
 Move the ~/bin/imgrab file to any folder that is callable through ~/.profile
