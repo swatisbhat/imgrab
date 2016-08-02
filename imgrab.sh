@@ -27,7 +27,8 @@ xtrue=0
 DATETIME="`date +%Y%m%d%H%M`"
 j=0
 total_size=0
-
+t_count=0
+folder="$HOME/.imgrab"
 #Colour setttings
 RED='\e[1;31m'
 CYAN='\e[1;36m'
@@ -61,6 +62,18 @@ done
 echo -ne "\r\b>Finishing up...                        "
 }
 #----------------------------------------------------------------------------#
+#trap Cltr-C
+
+control_c()
+# run if user hits control-c
+{
+echo -en "\nDownload interrupted by user.\n"
+echo -ne "`date '+%Y/%m/%d %H:%M:%S'` ${URL} ${t_count} ${j} Interrupted\n">>$folder/log
+exit
+}
+ 
+# trap keyboard interrupt (control-c)
+trap control_c SIGINT
 
 # parse options
 while getopts 'o:hf:x:' opt ; do
@@ -75,11 +88,11 @@ while getopts 'o:hf:x:' opt ; do
     x) xforms=$OPTARG;
 	xtrue=1;;
     \?) 
-        echo -e "Type${GR}${BOLD} $0 -h ${RESET}to display help";
+        echo -e "Type${GR}${BOLD} `basename $0` -h ${RESET}to display help";
         exit
         ;;
     :) echo "Option -$OPTARG requires an argument">&2;
-       echo -e "Type${GR}${BOLD} $0 -h ${RESET}to display help";
+       echo -e "Type${GR}${BOLD}`basename $0` -h ${RESET}to display help";
        exit
        ;;
 
@@ -93,7 +106,7 @@ shift $((OPTIND-1))
 if [ $# -ne 1 ]
 then
 echo "Invalid syntax, argument missing."
-echo -e "Type${GR}${BOLD} $0 -h${RESET} to display help"
+echo -e "Type${GR}${BOLD}`basename $0` -h${RESET} to display help"
 exit
 fi
 
@@ -119,6 +132,7 @@ echo
 file=( `sed '1,/^$/d' 0<&3|grep -oP 'src="\K\S+?(jpg|png|jpeg|gif|bmp|tif)(?=")'|sort -u|tee args`)
 
 t_count=${#file[@]}
+tot_count=$t_count;
 echo "Total Images Found : ${t_count}"
 
 #Customize as per options supplied
@@ -211,4 +225,5 @@ done
 if [ $j -eq $t_count ]
 then
 printf "\rFinished Downloading $t_count Images (%.2fKB)\n" "$total_size"
+`echo -ne "`date +%Y/%m/%d %H:%M:%s` $URL $t_count $j Successful"`>>$folder/log
 fi
