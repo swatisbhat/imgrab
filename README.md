@@ -1,8 +1,13 @@
 # imgrab
 A light-weight image download manager written in bash
+##INSTALLATION
+Unzip the downloaded zip file
+    cd imgrab-master
+    sh configure
+Move the ~/bin/imgrab file to any folder that is callable through ~/.profile
 
 ##USAGE:
-    ./imgrab.sh [OPTIONS] [url]
+    imgrab.sh [OPTIONS] [url]
 
 	Downloads all images from a specified url.
 	Default formats downloaded :   png,jpg,jpeg,gif,tif,bmp
@@ -16,13 +21,13 @@ A light-weight image download manager written in bash
   
 ##EXAMPLES:
     Download all the images and save them in the user input directory
-    ./imgrab.sh -o ~/my/input/dir [url]
+    imgrab.sh -o ~/my/input/dir [url]
 
     Download only png images and save them in the user input directory
-    ./imgrab.sh -o ~/my/input/dir -f "png" [url]
+    imgrab.sh -o ~/my/input/dir -f "png" [url]
 
     Download all images except png and jpg
-    ./imgrab.sh -x "png jpg" [url]
+    imgrab.sh -x "png jpg" [url]
 	  (This will save the images in a sub-dir [url-images] in the current directory)
  
 
