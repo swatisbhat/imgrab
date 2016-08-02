@@ -1,0 +1,13 @@
+#!/bin/bash
+echo "Assigning execute permission..."
+chmod +x imgrab.sh
+echo "Building Directory..."
+DIRECTORY="$HOME/bin"
+if [ ! -d "$DIRECTORY" ]
+then
+	mkdir $DIRECTORY
+fi
+sudo cp imgrab.sh $DIRECTORY/imgrab
+mkdir $HOME/.imgrab 
+touch $HOME/.imgrab/log
+echo "Done installing. type imgrab -h to get started."
