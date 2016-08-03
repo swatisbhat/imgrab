@@ -4,10 +4,10 @@ usage()
 {
 echo -e "\n${BL}${BOLD}${UL}HELP${RESET}"
 echo -e "\n\n${BL}${BOLD}USAGE:\n\n\t${WH}${BOLD}$0 [OPTIONS] [url]"
-echo -e "\n\t${GR}${BOLD}Downloads all images from a specified url.\n\tDefault formats downloaded : png,jpg,jpeg,gif,tif,bmp"
+echo -e "\n\t${GR}${BOLD}Downloads all images from a specified url.\n\tDefault formats downloaded : ${WH}${BOLD}png,jpg,jpeg,gif,tif,bmp\n\t${GR}${BOLD}Default download location  :${WH}${BOLD} sub-directory in current directory"
 echo -e "\n\n${BL}${BOLD}OPTIONS:"
 echo -e "\n\t${WH}${BOLD}-h                           ${GR}${BOLD}Print this help menu"
-echo -e "\t${WH}${BOLD}-o DIR                       ${GR}${BOLD}Save all images in the directory DIR\n\t                             (by default all images are saved in a sub-directory in the current directory)"
+echo -e "\t${WH}${BOLD}-o DIR                       ${GR}${BOLD}Save all images in the directory DIR"
 echo -e "\t${WH}${BOLD}-f \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Download specified formats/extensions only"
 echo -e "\t${WH}${BOLD}-x \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Exclude specified formats/extensions and download the rest"
 echo -e "\n\n${BL}${BOLD}EXAMPLES:"
@@ -24,10 +24,11 @@ echo -e "\t${GR}${BOLD}(This will save the images in a sub-dir [url-images] in t
 otrue=0
 ftrue=0
 xtrue=0
-DATETIME="`date +%Y%m%d%_H%M`"
+DATETIME="`date +%Y%m%d%H%M`"
 j=0
 total_size=0
-
+t_count=0
+folder="$HOME/.imgrab"
 #Colour setttings
 RED='\e[1;31m'
 CYAN='\e[1;36m'
@@ -61,6 +62,18 @@ done
 echo -ne "\r\b>Finishing up...                        "
 }
 #----------------------------------------------------------------------------#
+#trap Cltr-C
+
+control_c()
+# run if user hits control-c
+{
+echo -en "\nDownload interrupted by user.\n"
+echo -ne "`date '+%Y/%m/%d %H:%M:%S'` ${URL} ${t_count} ${j} Interrupted\n">>$folder/log
+exit
+}
+ 
+# trap keyboard interrupt (control-c)
+trap control_c SIGINT
 
 # parse options
 while getopts 'o:hf:x:' opt ; do
@@ -74,11 +87,12 @@ while getopts 'o:hf:x:' opt ; do
 	ftrue=1 ;;
     x) xforms=$OPTARG;
 	xtrue=1;;
-    \?) usage;
+    \?) 
+        echo -e "Type${GR}${BOLD} `basename $0` -h ${RESET}to display help";
         exit
         ;;
-    :) echo "Option -$OPTARG requires an argument";
-       echo "Type $0 -h to display help"
+    :) echo "Option -$OPTARG requires an argument">&2;
+       echo -e "Type${GR}${BOLD}`basename $0` -h ${RESET}to display help";
        exit
        ;;
 
@@ -91,7 +105,8 @@ shift $((OPTIND-1))
 #make sure one and only one mandatory arg(url) is present
 if [ $# -ne 1 ]
 then
-echo "Invalid syntax. Type $0 -h to display help"
+echo "Invalid syntax, argument missing."
+echo -e "Type${GR}${BOLD}`basename $0` -h${RESET} to display help"
 exit
 fi
 
@@ -117,6 +132,7 @@ echo
 file=( `sed '1,/^$/d' 0<&3|grep -oP 'src="\K\S+?(jpg|png|jpeg|gif|bmp|tif)(?=")'|sort -u|tee args`)
 
 t_count=${#file[@]}
+tot_count=$t_count;
 echo "Total Images Found : ${t_count}"
 
 #Customize as per options supplied
@@ -209,4 +225,5 @@ done
 if [ $j -eq $t_count ]
 then
 printf "\rFinished Downloading $t_count Images (%.2fKB)\n" "$total_size"
+`echo -ne "`date +%Y/%m/%d %H:%M:%s` $URL $t_count $j Successful"`>>$folder/log
 fi
