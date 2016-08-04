@@ -10,6 +10,8 @@ echo -e "\n\t${WH}${BOLD}-h                           ${GR}${BOLD}Print this hel
 echo -e "\t${WH}${BOLD}-o DIR                       ${GR}${BOLD}Save all images in the directory DIR"
 echo -e "\t${WH}${BOLD}-f \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Download specified formats/extensions only"
 echo -e "\t${WH}${BOLD}-x \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Exclude specified formats/extensions and download the rest"
+echo -e "\t${WH}${BOLD}-l NUM                       ${GR}${BOLD}Print last NUM entries of log file"
+echo -e "\t${WH}${BOLD}-L                           ${GR}${BOLD}Print full log history"
 echo -e "\n\n${BL}${BOLD}EXAMPLES:"
 echo -e "\n\t${GR}${BOLD}Download all the images and save them in the user input directory"
 echo -e "\t${WH}${BOLD}$0 -o ~/my/input/dir [url]"
@@ -24,6 +26,8 @@ echo -e "\t${GR}${BOLD}(This will save the images in a sub-dir [url-images] in t
 otrue=0
 ftrue=0
 xtrue=0
+ltrue=0
+Ltrue=0
 DATETIME="`date +%Y%m%d%H%M`"
 j=0
 total_size=0
@@ -75,8 +79,28 @@ exit
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
 
+#----------------------------------------------------------------------------#
+#print_log function to print log history
+print_log()
+{
+if [ $ltrue == 1 ]                       
+#print last n entries of log file    
+then
+awk -v NUM="$n_entries" '{a[i++]=$0} END {for(j=i-1;j>=i-NUM;j--) print a[j]}' $folder/log
+else
+if [ $Ltrue == 1 ]                       
+#print full log history
+then
+awk '{a[i++]=$0} END {for(j=i-1;j>=0;j--) print a[j]}' $folder/log
+fi
+fi
+}
+
+#----------------------------------------------------------------------------#
+
+
 # parse options
-while getopts 'o:hf:x:' opt ; do
+while getopts 'o:hf:x:Ll:' opt ; do
   case $opt in
     h) usage;
        exit
@@ -87,6 +111,13 @@ while getopts 'o:hf:x:' opt ; do
 	ftrue=1 ;;
     x) xforms=$OPTARG;
 	xtrue=1;;
+    l) n_entries=$OPTARG;
+        ltrue=1 ;
+        print_log;
+        exit;;
+    L) Ltrue=1;
+        print_log;
+        exit;;
     \?) 
         echo -e "Type${GR}${BOLD} `basename $0` -h ${RESET}to display help";
         exit
