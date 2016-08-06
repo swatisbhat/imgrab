@@ -72,7 +72,7 @@ control_c()
 # run if user hits control-c
 {
 echo -en "\nDownload interrupted by user.\n"
-echo -ne "`date '+%Y/%m/%d %H:%M:%S'` ${URL} ${t_count} ${j} Interrupted\n">>$folder/log
+echo -ne "`date '+%Y/%m/%d %H:%M:%S'` ${short_url} ${t_count} ${j} Interrupted\n">>$folder/log
 exit
 }
  
@@ -86,18 +86,17 @@ print_log()
 if [ $ltrue == 1 ]                       
 #print last n entries of log file    
 then
-awk -v NUM="$n_entries" '{a[i++]=$0} END {for(j=i-1;j>=i-NUM;j--) print a[j]}' $folder/log
+awk 'BEGIN{printf("--------------------------------------------------------------------------------------\n%-11s %-9s %-30s %-6s %-11s %-13s\n","DATE","TIME","URL","FOUND","DOWNLOADED","STATUS")} {printf("%-11s %-9s %-30s %-6s %-11s %-13s\n",$1,$2,$3,$4,$5,$6)}' $folder/log|awk -v NUM="$n_entries" '{a[i++]=$0} END {printf("%s\n%s\n%s\n",a[0],a[1],a[0]);for(j=i-1;j>=i-NUM;j--) print a[j];print a[0]}'
 else
 if [ $Ltrue == 1 ]                       
 #print full log history
 then
-awk '{a[i++]=$0} END {for(j=i-1;j>=0;j--) print a[j]}' $folder/log
+awk 'BEGIN{printf("--------------------------------------------------------------------------------------\n%-11s %-9s %-30s %-6s %-11s %-13s\n","DATE","TIME","URL","FOUND","DOWNLOADED","STATUS")} {printf("%-11s %-9s %-30s %-6s %-11s %-13s\n",$1,$2,$3,$4,$5,$6)}' $folder/log|awk '{a[i++]=$0} END {printf("%s\n%s\n%s\n",a[0],a[1],a[0]);for(j=i-1;j>=3;j--) print a[j];print a[0]}'
 fi
 fi
 }
 
 #----------------------------------------------------------------------------#
-
 
 # parse options
 while getopts 'o:hf:x:Ll:' opt ; do
@@ -148,6 +147,8 @@ then
 URL='http://'$URL
 fi
 printf "Connecting to: ${URL}\n"
+
+short_url="`echo "$URL"|grep -Po '(http|https)://.+?(/|$)'`"
 
 #Send GET request and obtain html
 IFS=/ read protocol blank host query <<<"$URL";
@@ -256,5 +257,5 @@ done
 if [ $j -eq $t_count ]
 then
 printf "\rFinished Downloading $t_count Images (%.2fKB)\n" "$total_size"
-`echo -ne "`date +%Y/%m/%d %H:%M:%s` $URL $t_count $j Successful"`>>$folder/log
+echo -ne "`date +"%Y/%m/%d %H:%M:%S"` $short_url $t_count $j Successful\n">>$folder/log
 fi
