@@ -10,6 +10,8 @@ echo -e "\n\t${WH}${BOLD}-h                           ${GR}${BOLD}Print this hel
 echo -e "\t${WH}${BOLD}-o DIR                       ${GR}${BOLD}Save all images in the directory DIR"
 echo -e "\t${WH}${BOLD}-f \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Download specified formats/extensions only"
 echo -e "\t${WH}${BOLD}-x \"ext1 ext2 ext3 ..\"       ${GR}${BOLD}Exclude specified formats/extensions and download the rest"
+echo -e "\t${WH}${BOLD}-l NUM                       ${GR}${BOLD}Print last NUM entries of log file"
+echo -e "\t${WH}${BOLD}-L                           ${GR}${BOLD}Print full log history"
 echo -e "\n\n${BL}${BOLD}EXAMPLES:"
 echo -e "\n\t${GR}${BOLD}Download all the images and save them in the user input directory"
 echo -e "\t${WH}${BOLD}$0 -o ~/my/input/dir [url]"
@@ -24,6 +26,8 @@ echo -e "\t${GR}${BOLD}(This will save the images in a sub-dir [url-images] in t
 otrue=0
 ftrue=0
 xtrue=0
+ltrue=0
+Ltrue=0
 DATETIME="`date +%Y%m%d%H%M`"
 j=0
 total_size=0
@@ -68,15 +72,34 @@ control_c()
 # run if user hits control-c
 {
 echo -en "\nDownload interrupted by user.\n"
-echo -ne "`date '+%Y/%m/%d %H:%M:%S'` ${URL} ${t_count} ${j} Interrupted\n">>$folder/log
+echo -ne "`date '+%Y/%m/%d %H:%M:%S'` ${short_url} ${t_count} ${j} Interrupted\n">>$folder/log
 exit
 }
  
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
 
+#----------------------------------------------------------------------------#
+#print_log function to print log history
+print_log()
+{
+if [ $ltrue == 1 ]                       
+#print last n entries of log file    
+then
+awk 'BEGIN{printf("--------------------------------------------------------------------------------------\n%-11s %-9s %-30s %-6s %-11s %-13s\n","DATE","TIME","URL","FOUND","DOWNLOADED","STATUS")} {printf("%-11s %-9s %-30s %-6s %-11s %-13s\n",$1,$2,$3,$4,$5,$6)}' $folder/log|awk -v NUM="$n_entries" '{a[i++]=$0} END {printf("%s\n%s\n%s\n",a[0],a[1],a[0]);for(j=i-1;j>=i-NUM;j--) print a[j];print a[0]}'
+else
+if [ $Ltrue == 1 ]                       
+#print full log history
+then
+awk 'BEGIN{printf("--------------------------------------------------------------------------------------\n%-11s %-9s %-30s %-6s %-11s %-13s\n","DATE","TIME","URL","FOUND","DOWNLOADED","STATUS")} {printf("%-11s %-9s %-30s %-6s %-11s %-13s\n",$1,$2,$3,$4,$5,$6)}' $folder/log|awk '{a[i++]=$0} END {printf("%s\n%s\n%s\n",a[0],a[1],a[0]);for(j=i-1;j>=3;j--) print a[j];print a[0]}'
+fi
+fi
+}
+
+#----------------------------------------------------------------------------#
+
 # parse options
-while getopts 'o:hf:x:' opt ; do
+while getopts 'o:hf:x:Ll:' opt ; do
   case $opt in
     h) usage;
        exit
@@ -87,6 +110,13 @@ while getopts 'o:hf:x:' opt ; do
 	ftrue=1 ;;
     x) xforms=$OPTARG;
 	xtrue=1;;
+    l) n_entries=$OPTARG;
+        ltrue=1 ;
+        print_log;
+        exit;;
+    L) Ltrue=1;
+        print_log;
+        exit;;
     \?) 
         echo -e "Type${GR}${BOLD} `basename $0` -h ${RESET}to display help";
         exit
@@ -117,6 +147,8 @@ then
 URL='http://'$URL
 fi
 printf "Connecting to: ${URL}\n"
+
+short_url="`echo "$URL"|grep -Po '(http|https)://.+?(/|$)'`"
 
 #Send GET request and obtain html
 IFS=/ read protocol blank host query <<<"$URL";
@@ -225,5 +257,5 @@ done
 if [ $j -eq $t_count ]
 then
 printf "\rFinished Downloading $t_count Images (%.2fKB)\n" "$total_size"
-`echo -ne "`date +%Y/%m/%d %H:%M:%s` $URL $t_count $j Successful"`>>$folder/log
+echo -ne "`date +"%Y/%m/%d %H:%M:%S"` $short_url $t_count $j Successful\n">>$folder/log
 fi

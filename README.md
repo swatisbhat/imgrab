@@ -18,7 +18,9 @@ Move the ~/bin/imgrab file to any folder you wish that is callable through ~/.pr
   	-o DIR                         Save all images in the directory DIR
   	-f "ext1 ext2 ext3 .."         Download specified formats/extensions only
   	-x "ext1 ext2 ext3 .."         Exclude specified formats/extensions and download the rest
-  
+  	-l NUM                         Print last NUM entries of log file
+  	-L                             Print full log history
+  	
 ##EXAMPLES:
     Download all the images and save them in the user input directory
     imgrab -o ~/my/input/dir [url]
