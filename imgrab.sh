@@ -97,7 +97,16 @@ fi
 }
 
 #----------------------------------------------------------------------------#
+#network_error handling
 
+error_exit()
+{
+echo -ne "`date '+%Y/%m/%d %H:%M:%S'` ${short_url} ${t_count} ${j} Network_Error\n">>$folder/log
+echo -ne "Network Error. Make sure you're connected to the internet.\n" 1>&2
+exit 1
+}
+
+#---------------------------------------------------------------------------#
 # parse options
 while getopts 'o:hf:x:Ll:' opt ; do
   case $opt in
@@ -152,7 +161,7 @@ short_url="`echo "$URL"|grep -Po '(http|https)://.+?(/|$)'`"
 
 #Send GET request and obtain html
 IFS=/ read protocol blank host query <<<"$URL";
-exec 3< /dev/tcp/$host/80;
+exec 3< /dev/tcp/$host/80||error_exit;
 {
 echo GET /$query HTTP/1.1;
 echo connection: close;
@@ -237,7 +246,7 @@ printf "\rFetching file info...                            "
 #Parse headers
 IFS=/ read protocol blank host query <<<"$abs_link";
 
-exec 3< /dev/tcp/$host/80;
+exec 3< /dev/tcp/$host/80||error_exit;
 {
 echo HEAD /$query HTTP/1.1;
 echo connection: close;
