@@ -144,7 +144,7 @@ shift $((OPTIND-1))
 #make sure one and only one mandatory arg(url) is present
 if [ $# -ne 1 ]
 then
-echo "Invalid syntax, argument missing."
+echo "Invalid syntax."
 echo -e "Type${GR}${BOLD}`basename $0` -h${RESET} to display help"
 exit
 fi
