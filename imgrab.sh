@@ -3,7 +3,7 @@
 usage()
 {
 echo -e "\n${BL}${BOLD}${UL}HELP${RESET}"
-echo -e "\n\n${BL}${BOLD}USAGE:\n\n\t${WH}${BOLD}$0 [OPTIONS] [url]"
+echo -e "\n\n${BL}${BOLD}USAGE:\n\n\t${WH}${BOLD}`basename $0` [OPTIONS] [url]"
 echo -e "\n\t${GR}${BOLD}Downloads all images from a specified url.\n\tDefault formats downloaded : ${WH}${BOLD}png,jpg,jpeg,gif,tif,bmp\n\t${GR}${BOLD}Default download location  :${WH}${BOLD} sub-directory in current directory"
 echo -e "\n\n${BL}${BOLD}OPTIONS:"
 echo -e "\n\t${WH}${BOLD}-h                           ${GR}${BOLD}Print this help menu"
@@ -14,11 +14,11 @@ echo -e "\t${WH}${BOLD}-l NUM                       ${GR}${BOLD}Print last NUM e
 echo -e "\t${WH}${BOLD}-L                           ${GR}${BOLD}Print full log history"
 echo -e "\n\n${BL}${BOLD}EXAMPLES:"
 echo -e "\n\t${GR}${BOLD}Download all the images and save them in the user input directory"
-echo -e "\t${WH}${BOLD}$0 -o ~/my/input/dir [url]"
+echo -e "\t${WH}${BOLD}`basename $0` -o ~/my/input/dir [url]"
 echo -e "\n\t${GR}${BOLD}Download only png images and save them in the user input directory"
-echo -e "\t${WH}${BOLD}$0 -o ~/my/input/dir -f \"png\" [url]"
+echo -e "\t${WH}${BOLD}`basename $0` -o ~/my/input/dir -f \"png\" [url]"
 echo -e "\n\t${GR}${BOLD}Download all images except png and jpg"
-echo -e "\t${WH}${BOLD}$0 -x \"png jpg\" [url]"
+echo -e "\t${WH}${BOLD}`basename $0` -x \"png jpg\" [url]"
 echo -e "\t${GR}${BOLD}(This will save the images in a sub-dir [url-images] in the current directory)\n${RESET}"
 }
 
